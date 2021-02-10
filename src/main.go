@@ -29,6 +29,8 @@ func main() {
 
     //println("Connection to database established")
 
+    //db.DropTable(&People{})
+    //db.Singular(true)
     db.AutoMigrate(&People{})
 
     user := People{
@@ -102,4 +104,8 @@ type People struct {
     Username string
     FirstName  string
     LastName string
+}
+
+func (u People) TableName() string {
+    return "stackholders"
 }
