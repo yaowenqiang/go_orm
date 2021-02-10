@@ -4,11 +4,25 @@ import (
     "gorm.io/gorm"
     "gorm.io/driver/postgres"
     "fmt"
+    "log"
+    "time"
+    "os"
+	"gorm.io/gorm/logger"
 )
 
 func main() {
+		newLogger := logger.New(
+	  log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
+	  logger.Config{
+		SlowThreshold: time.Second,   // 慢 SQL 阈值
+		LogLevel:      logger.Silent, // Log level
+		Colorful:      false,         // 禁用彩色打印
+	  },
+	)
     dsn := "host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable"
-    db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+    db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
+		Logger: newLogger,
+	})
 
     if err != nil {
         panic(err.Error())
@@ -31,7 +45,16 @@ func main() {
 
     //db.DropTable(&People{})
     //db.Singular(true)
-    db.AutoMigrate(&People{})
+    db.Debug().AutoMigrate(&People{})
+	//db.Model(&People{}).AddIndex("idx_first_name", "first_name")
+	//db.Model(&People{}).RemoveIndex("idx_first_name")
+	//db.Model(&People{}).AddUniqueIndex("idx_last_name", "last_name")
+
+	/*
+	for _, f := range db.NewScope(&People{}).Fields() {
+		fmt.Println(f.Name)
+	}
+	*/
 
     user := People{
         Username: "jack",
@@ -100,12 +123,18 @@ func main() {
 }
 
 type People struct {
-    ID uint
-    Username string
-    FirstName  string
-    LastName string
+    //ID uint
+	Model gorm.Model `gorm:"embedded"`
+	UserID int  `gorm:"primaryKey"`
+    Username string `gorm:"comment:用户名;size:15;not null"`
+	FirstName  string `gorm:"size:15;not null;column:FirstName"`
+	LastName string `gorm:"unique;uniqueIndex;not null;column:LastName;default:smith"`
+    Count int `gorm:"autoIncrement"`
+    TempField bool `gorm:"-"`
 }
 
 func (u People) TableName() string {
     return "stackholders"
 }
+
+
