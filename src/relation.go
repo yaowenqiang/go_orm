@@ -40,8 +40,11 @@ func main() {
     if err != nil {
         panic(err.Error())
     }
-    db.Debug().AutoMigrate(&User{})
-    db.Debug().AutoMigrate(&Calendar{})
+    //db.Debug().AutoMigrate(&User{})
+    //db.Debug().AutoMigrate(&Calendar{})
+
+    db.AutoMigrate(&User{})
+    db.AutoMigrate(&Calendar{})
 
     user := User{
         Username: "jack",
@@ -53,16 +56,16 @@ func main() {
     }
 
     db.Create(&user)
-    /*
 
     u := User{}
     c := Calendar{}
 
-    db.First(&u).Related(&c, "calendar")
+    db.First(&u)
+
+    db.Debug().Model(&u).Association("Calendar").Find(&c)
 
     fmt.Println(u)
     fmt.Println(c)
-    */
 
 
 
