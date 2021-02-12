@@ -47,6 +47,22 @@ func main() {
     db.AutoMigrate(&Calendar{})
     db.AutoMigrate(&Appointment{})
 
+    users := []User{
+        {
+            Username: "Jack",
+        },
+        {
+            Username: "John",
+        },
+        {
+            Username: "Jimmy",
+        },
+    }
+
+    for i := range users {
+        db.Debug().Save(&users[i])
+    }
+
     user := User{
         Username: "jack",
         FirstName: "jack",
@@ -56,9 +72,11 @@ func main() {
             Appointments: []Appointment{
                 {
                     Subject:"meet with jack ma",
+                    Attendees: users,
                 },
                 {
                     Subject:"meet with tony ma",
+                    Attendees: users,
                 },
                 {
                     Subject:"meet with jack chen",
@@ -66,6 +84,7 @@ func main() {
             },
         },
     }
+
 
     db.Debug().Create(&user)
 
@@ -84,7 +103,7 @@ func main() {
     fmt.Printf("user.calendar: %+v\n", u.Calendar.Name)
     fmt.Println(c)
     //fmt.Println(a)
-    db.Debug().Delete(&u)
+    //db.Debug().Delete(&u)
 
     fmt.Println("done")
 }
@@ -93,7 +112,8 @@ type User struct {
 	 gorm.Model
     Username string `gorm:"comment:用户名;size:15;not null"`
 	FirstName  string `gorm:"size:15;not null;column:FirstName"`
-	LastName string `gorm:"unique;uniqueIndex;not null;column:LastName;default:smith"`
+	//LastName string `gorm:"unique;uniqueIndex;not null;column:LastName;default:smith"`
+	LastName string `gorm:"not null;column:LastName;default:smith"`
     Calendar Calendar `gorm:"foreignKey:UserID"`
     //Calendar Calendar
     //CalendarID uint `gorm:"foreignKey:CalendarID"`
@@ -116,4 +136,5 @@ type Appointment struct {
     StartTime time.Time
     Length uint
     CalendarID uint
+    Attendees []User  `gorm:"many2many:appointment_user"`
 }
