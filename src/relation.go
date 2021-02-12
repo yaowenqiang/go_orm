@@ -46,6 +46,7 @@ func main() {
     db.AutoMigrate(&User{})
     db.AutoMigrate(&Calendar{})
     db.AutoMigrate(&Appointment{})
+    db.AutoMigrate(&TaskList{})
 
     users := []User{
         {
@@ -124,7 +125,7 @@ type Calendar struct {
     gorm.Model
     Name string
     UserID uint
-    Appointments []Appointment
+    Appointments []Appointment `gorm:"polymorphic:Owner"`
 }
 
 
@@ -135,6 +136,13 @@ type Appointment struct {
     Description string
     StartTime time.Time
     Length uint
-    CalendarID uint
+    //CalendarID uint
+    OwnerID uint
+    OwnerType string
     Attendees []User  `gorm:"many2many:appointment_user"`
+}
+
+type TaskList struct {
+    gorm.Model
+    Appointments []Appointment `gorm:"polymorphic:Owner"`
 }
