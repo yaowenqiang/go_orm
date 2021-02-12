@@ -96,10 +96,20 @@ func main() {
     db.Debug().First(&u)
 
     //db.Debug().Model(&Calendar{}).AddForeignKey("user_id","users(id)", "cascade", "casedade")
+    /*
+    db.Debug().Model(&u).Association("Calendar").Find(&c)
+    .Find(&Appointments)
+    .Append(&appointmentsToAdd)
+    .Delete(&appointmentsToDelete)
+    .Replace(&appointmentsToSubstitute)
+    .Count()
+    .Clear()
+    */
 
-    //db.Debug().Model(&u).Association("Calendar").Find(&c)
+
     db.Debug().Preload("Appointments").Find(&c)
     //db.Debug().Model(&c).Association("Appointment").Find(&a)
+    //db.Model(&Calendar{}).Association("Appointments")
 
     fmt.Printf("user.calendar: %+v\n", u.Calendar.Name)
     fmt.Println(c)
