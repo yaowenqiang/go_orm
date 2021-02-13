@@ -8,6 +8,7 @@ import (
     "time"
     "os"
 	"gorm.io/gorm/logger"
+    "github.com/davecgh/go-spew/spew"
 )
 
 func main() {
@@ -61,6 +62,19 @@ func main() {
     last := User{}
     db.Last(&last)
     fmt.Println(last)
+
+
+    //find all records
+    users := []User{}
+    //db.Find(&users,&User{Username:"jack"})
+    //db.Find(&users,&User{Username:"jack"})
+    //db.Find(&users,map[string]interface{}{"username":"jack"})
+    db.Find(&users,"username = ? ", "jack")
+
+    for _, r :=  range users {
+        //fmt.Printf("\n%+v\n", r)
+        spew.Dump(r)
+    }
 
 
     fmt.Println("done")
