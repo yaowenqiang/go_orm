@@ -122,7 +122,8 @@ func main() {
 type User struct {
 	 gorm.Model
     Username string `gorm:"comment:用户名;size:15;not null"`
-	FirstName  string `gorm:"size:15;not null;column:FirstName"`
+	//FirstName  string `gorm:"size:15;not null;column:FirstName"`
+	FirstName  string `gorm:"size:15;column:FirstName"`
 	//LastName string `gorm:"unique;uniqueIndex;not null;column:LastName;default:smith"`
 	LastName string `gorm:"not null;column:LastName;default:smith"`
     Calendar Calendar `gorm:"foreignKey:UserID"`
