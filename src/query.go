@@ -176,6 +176,18 @@ func main() {
     }
 
 
+    //Aggregation with group and having
+
+
+    arows, _ := db.Model(&Appointment{}).Select("user_id, sum(length) as total_length").Group("user_id").Having("user_id = ?", 1).Rows()
+
+    for arows.Next() {
+        var user_id, length int
+        arows.Scan(&user_id, &length)
+        fmt.Printf("%d, %d\n", user_id, length)
+
+    }
+
 
 
 
