@@ -126,8 +126,27 @@ func main() {
     //Count
 
     var count int64
+
+    //Only count deleted_at = null nmber
+
     db.Model(&User{}).Count(&count)
     fmt.Println(count)
+
+
+
+    //Attrs
+
+    fu := User{}
+
+    // set default value if some fields has no value
+
+    db.Where("username = ?", "jobs").Attrs(&User{FirstName: "jim"}).FirstOrInit(&fu)
+
+
+    // Override  fields  value
+    db.Where("username = ?", "jack").Assign(&User{FirstName: "jim"}).FirstOrInit(&fu)
+
+    spew.Dump(fu)
 
     fmt.Println("done")
 
