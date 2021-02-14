@@ -82,12 +82,15 @@ func main() {
    // db.Not("created_at BETWEEN  ? AND ?", time.Now().Add(-30*24 * time.Hour), time.Now()).Or("Username = ?","jimmy").Find(&users)
 
    //Preload
-    db.Preload("Calendar.Appointments").Find(&users)
+    //db.Preload("Calendar.Appointments").Find(&users)
+   // db.Limit(2).Order("first_name desc").Find(&users)
+    db.Limit(2).Offset(2).Order("first_name desc").Find(&users)
     //db.Preload("Calendar").Find(&users)
 
     for _, r :=  range users {
         //fmt.Printf("\n%+v\n", r)
-        spew.Dump(r.Calendar)
+        //spew.Dump(r.Calendar)
+        spew.Dump(r)
     }
 
 
