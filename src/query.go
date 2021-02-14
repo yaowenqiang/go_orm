@@ -190,6 +190,14 @@ func main() {
 
 
 
+    //Raw SQL
+
+    rawUsers := User{}
+    db.Exec("SELECT * FROM Users").Find(&rawUsers)
+
+    spew.Dump(rawUsers)
+
+
 
     fmt.Println("done")
 
