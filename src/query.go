@@ -69,7 +69,17 @@ func main() {
     //db.Find(&users,&User{Username:"jack"})
     //db.Find(&users,&User{Username:"jack"})
     //db.Find(&users,map[string]interface{}{"username":"jack"})
-    db.Find(&users,"username = ? ", "jack")
+    //db.Find(&users,"username = ? ", "jack")
+    //db.Where("username = ? ", "jack").Find(&users)
+    //db.Where(&User{Username:"jack"}).Find(&users)
+    //db.Where(map[string]interface{}{"username":"jack"}).Find(&users)
+    //db.Where("username in (?)",[]string{"jack"}).Find(&users)
+    //db.Where("username like ?", "%jack%").Find(&users)
+    //db.Where("username like ? and first_name = ?", "%jack%", "jason").Find(&users)
+    //db.Where("created_at < ?", time.Now()).Find(&users)
+   // db.Where("created_at BETWEEN  ? AND ?", time.Now().Add(-30*24 * time.Hour), time.Now()).Find(&users)
+   // db.Not("created_at BETWEEN  ? AND ?", time.Now().Add(-30*24 * time.Hour), time.Now()).Find(&users)
+    db.Not("created_at BETWEEN  ? AND ?", time.Now().Add(-30*24 * time.Hour), time.Now()).Or("Username = ?","jimmy").Find(&users)
 
     for _, r :=  range users {
         //fmt.Printf("\n%+v\n", r)
