@@ -79,11 +79,15 @@ func main() {
     //db.Where("created_at < ?", time.Now()).Find(&users)
    // db.Where("created_at BETWEEN  ? AND ?", time.Now().Add(-30*24 * time.Hour), time.Now()).Find(&users)
    // db.Not("created_at BETWEEN  ? AND ?", time.Now().Add(-30*24 * time.Hour), time.Now()).Find(&users)
-    db.Not("created_at BETWEEN  ? AND ?", time.Now().Add(-30*24 * time.Hour), time.Now()).Or("Username = ?","jimmy").Find(&users)
+   // db.Not("created_at BETWEEN  ? AND ?", time.Now().Add(-30*24 * time.Hour), time.Now()).Or("Username = ?","jimmy").Find(&users)
+
+   //Preload
+    db.Preload("Calendar.Appointments").Find(&users)
+    //db.Preload("Calendar").Find(&users)
 
     for _, r :=  range users {
         //fmt.Printf("\n%+v\n", r)
-        spew.Dump(r)
+        spew.Dump(r.Calendar)
     }
 
 
@@ -97,6 +101,7 @@ type User struct {
 	LastName  string
     Salary uint
     Username string
+    Calendar Calendar
     Appointments []Appointment `gorm:"foreignKey:UserID"`
 }
 
@@ -109,6 +114,8 @@ type Appointment struct {
     //Attendees []*User
     Subject string
     Description string
+    OwnerID uint
+    OwnerType string
     Length uint
 }
 
@@ -122,3 +129,9 @@ func (u *User) AfterUpdate(db *gorm.DB) error {
     return nil
 }
 
+type Calendar struct {
+    gorm.Model
+    Name string
+    UserID uint
+    Appointments []Appointment `gorm:"polymorphic:Owner"`
+}
