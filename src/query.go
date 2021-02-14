@@ -159,6 +159,26 @@ func main() {
         spew.Dump(r)
     }
 
+    //Rows
+    rows, _ := db.Model(&User{}).Joins("inner join calendars on calendars.user_id = users.id").Select("users.first_name, users.last_name, calendars.name").Rows()
+
+
+    userVMs3 := []UserViewModel{}
+
+    for  rows.Next() {
+        uvm := UserViewModel{}
+        rows.Scan(&uvm.FirstName, &uvm.LastName, &uvm.CalendarName)
+        userVMs3 = append(userVMs3,  uvm)
+    }
+
+    for _, r := range userVMs2 {
+        spew.Dump(r)
+    }
+
+
+
+
+
     fmt.Println("done")
 
 
