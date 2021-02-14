@@ -4,23 +4,28 @@ import (
     "gorm.io/gorm"
     "gorm.io/driver/postgres"
     "fmt"
-    "log"
+    _ "log"
+    "context"
     "time"
-    "os"
+    _ "os"
 	"gorm.io/gorm/logger"
-    _ "github.com/davecgh/go-spew/spew"
+    "github.com/davecgh/go-spew/spew"
     "errors"
 )
 
 func main() {
+    /*
 		newLogger := logger.New(
 	  log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
 	  logger.Config{
 		SlowThreshold: time.Second,   // 慢 SQL 阈值
-		LogLevel:      logger.Silent, // Log level
+		//LogLevel:      logger.Silent, // Log level
+		LogLevel:      logger.Info, // Log level
 		Colorful:      true,         // 禁用彩色打印
 	  },
 	)
+    */
+    newLogger := myLogger{}
     dsn := "host=localhost user=postgres password=postgres dbname=postgres port=5432 sslmode=disable"
     db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{
 		Logger: newLogger,
@@ -42,7 +47,9 @@ func main() {
     if err != nil {
         panic(err.Error())
     }
-    db = db.Debug()
+    //db = db.Debug()
+    //db.LogMode(true)
+    //db.SetLogger(true)
 
     user := User{
         Username:"jackyao",
@@ -59,6 +66,14 @@ func main() {
     db.Save(&user)
 
     fmt.Println("Deleting")
+
+
+    //Scopes
+
+    appts := []Appointment{}
+    db.Scopes(LongMeetings).Find(&appts)
+
+    spew.Dump(appts)
     db.Delete(&user)
 
 }
@@ -145,4 +160,30 @@ func (c *Calendar) AfterCreate(db *gorm.DB) error {
     //return nil
 
     return errors.New("can't create new calendar!")
+}
+
+func LongMeetings(db *gorm.DB) *gorm.DB {
+    return db.Where("length > ?", 60)
+}
+
+type myLogger struct {
+}
+
+func (ml *myLogger) jogMode(level logger.LogLevel) Logger.Interface {
+    newLogger := myLogger{}
+    return &newLogger
+
+}
+
+func (ml *myLogger) Info(ctx context.Context, msg string, data ...interface{}) {
+    fmt.Printf("%s\n", msg)
+}
+func (ml *myLogger) Warn(ctx context.Context, msg string, data ...interface{}) {
+    fmt.Printf("%s\n", msg)
+}
+func (ml *myLogger) Error(ctx context.Context, msg string, data ...interface{}) {
+    fmt.Printf("%s\n", msg)
+}
+func (ml *myLogger) Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error) {
+    fmt.Printf("trace\n")
 }
