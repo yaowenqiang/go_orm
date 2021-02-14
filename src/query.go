@@ -84,15 +84,50 @@ func main() {
    //Preload
     //db.Preload("Calendar.Appointments").Find(&users)
    // db.Limit(2).Order("first_name desc").Find(&users)
-    db.Limit(2).Offset(2).Order("first_name desc").Find(&users)
+    //db.Limit(2).Offset(2).Order("first_name desc").Find(&users)
     //db.Preload("Calendar").Find(&users)
 
+    //Select specific fields
+    //db.Select([]string{"first_name", "last_name"}).Limit(2).Offset(2).Order("first_name desc").Find(&users)
+
+    //Pluck
+    usernames := []string{}
+
+    db.Model(&User{}).Pluck("username", &usernames)
+
+    userVMs := []UserViewModel{}
+    db.Model(&User{}).Select([]string{"first_name", "last_name"}).Scan(&userVMs)
+
+
+    for _, m :=  range userVMs {
+        //fmt.Printf("\n%+v\n", r)
+        //spew.Dump(r.Calendar)
+        spew.Dump(m)
+    }
+
+
+
+
+    db.Find(&users)
     for _, r :=  range users {
         //fmt.Printf("\n%+v\n", r)
         //spew.Dump(r.Calendar)
         spew.Dump(r)
     }
 
+    for _, u :=  range usernames {
+        //fmt.Printf("\n%+v\n", r)
+        //spew.Dump(r.Calendar)
+        spew.Dump(u)
+    }
+
+
+
+    //Count
+
+    var count int64
+    db.Model(&User{}).Count(&count)
+    fmt.Println(count)
 
     fmt.Println("done")
 
@@ -137,4 +172,10 @@ type Calendar struct {
     Name string
     UserID uint
     Appointments []Appointment `gorm:"polymorphic:Owner"`
+}
+
+
+type  UserViewModel struct {
+    FirstName string
+    LastName string
 }
