@@ -148,7 +148,20 @@ func main() {
 
     spew.Dump(fu)
 
+
+    userVMs2 := []UserViewModel{}
+
+    //Projections(投影)
+    //fetch subset fields from parent and child table and map to new struct object
+    db.Model(&User{}).Joins("inner join calendars on calendars.user_id = users.id").Select("users.first_name, users.last_name, calendars.name").Scan(&userVMs2)
+
+    for _, r := range userVMs2 {
+        spew.Dump(r)
+    }
+
     fmt.Println("done")
+
+
 
 }
 
@@ -197,4 +210,5 @@ type Calendar struct {
 type  UserViewModel struct {
     FirstName string
     LastName string
+    CalendarName string `gorm:"column:name"`
 }
