@@ -78,6 +78,54 @@ insert into supportdrones(dronename, number_of_monitors, sickdays, keepcool, sup
 > alter table managementdrones inherit companydrones
 > alter table managementdrones no inherit supportdrones
 
+## Concurrency and the MVCC(Multi Version Concurrency Control)
+
+> dirty read
+> shared lock
+> exclusive lock
+
+> select * from badges (nolock) // sql server query
+
+> create table badges (name varchar(50), badgeid integer, userid integer);
+
+> insert into badges(userid, name, badgeid) values(1, 'old name', 11);
+
+
+// pg
+
+> begin transaction:
+update badges set name = 'new name' where  userid = 1;
+select * from badges where userid = 1 // will get the new name in the transaction
+
+
+> select * from badges where userid = 1 ; // run in another session will get the old name 
+
+> begin transaction:
+update badges set name = 'another new name' where  userid = 1;//dead locks
+
+## Performance tuning
+
+> select p.postid, p.answercount, p.viewcount,p.title, p.tags, u.userid, u.displaynae, u.reputation
+from posts p inner join users u on p.owneruserid = u.userid
+where p.posttypeid = 1
+order by p.creationdate desc
+limit 20
+
+> create index ix_postfrontpagesearch on posts using btree (posttypeid, creationdate desc)
+
+> show cpu_index_tuple_cost;
+> set cpu_index_tuple_cost .0005;
+explain analyze select p.postid, p.answercount, p.viewcount,p.title, p.tags, u.userid, u.displaynae, u.reputation
+from posts p inner join users u on p.owneruserid = u.userid
+where p.posttypeid = 1
+order by p.creationdate desc
+limit 20
+
+> show random_page_cost;
+set random_page_cost = 8;
+
+
+
 
 
 
