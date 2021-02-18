@@ -41,3 +41,66 @@ j
 > select currval("typesample_rowid_seq")
 > select nextval("typesample_rowid_seq")
 
+
+# Table inheritance
+
+```sql```
+> create table companydrones (
+    dronename varchar(100),
+    number_of_monitors smallint,
+    sickdays smallint
+    ) ;
+
+> insert into companydrones(dronename, number_of_monitors, sickdays) values('Rob sullivan', 2,14),('james avery', 1,31);
+
+``````
+
+> create table companydrones (
+    supportemail varchar(100),
+    keepcool bit,
+    ) inherits (companydrones) ;
+
+
+
+> create  table supportdrones(supportemail varchar(50), keepcool bit) inherits(companydrones);
+
+insert into supportdrones(dronename, number_of_monitors, sickdays, keepcool, supportemail) values('jack yao', 1, 11, '0' , 'yaowenqiang111@cooco
+ m'); 
+
+//only select recoreds in companydrones
+> select * from only companydrones
+
+> create  table managementdrones(officenumber int, annoyingparkingspot boolean) inherits(supportdrones);
+
+> insert into managementdrones(dronename, number_of_monitors, sickdays, supportemail, keepcool, officenumber, annoyingparkingspot) values('scoot h
+ an', 15, 72, 'scooth@stackover.com', '1', 1, true);
+
+> alter table managementdrones inherit companydrones
+> alter table managementdrones no inherit supportdrones
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
