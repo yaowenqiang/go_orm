@@ -124,12 +124,120 @@ limit 20
 > show random_page_cost;
 set random_page_cost = 8;
 
+### Partitioning
+
+> Partitioning makes large tables or indexes more manageable, because partitioning enables you to manage and access subsets of data quickly and efficiently, while maintaining the integrity of a data collection " - (SQL Server) MSDN"
+
+
+posttypeid = 1 = questions
+posttypeid = 2 = answers
+
+> create table postroot (postid serial, posttypeid int, body text, userid int, lasteditoruserid int);
+> create table questions (acceptedanswerid int, viewcount int, title varchar(255), tags varchar(255), closedate timestamptz, score int) inherits (postroot);
+> create table answers (accepted bool, questionid int, score int) inherits (postroot);
+> create table comments (questionid int) inherits (postroot);
+
+
+> alter table postroot add constraint pk_postroot primary key (postid);
+> alter table questions add constraint pk_questions primary key (postid);
+> alter table answers add constraint pk_answers primary key (postid);
+
+create index ix_question_creationdatedesc on questions (creationdate desc)
+
+### Quering Text
+
+select displayname from users where displayname = 'xxx';
+
+create index ix_displayname on users using btree (displayname);
+
+select displayname from users where lower(displayname) = 'xxx';
+
+
+#### Index functions
+
+create index ix_lowercaseddisplayname on users using btree (loser(displayname::text) collate pg_catelog."default");
+
+### Full text indexing
+
+
+select count(0) from posts where tags like '%postgresql%';
+
+create index fti_tagsindex
+on posts
+using gin
+(to_tsvector(english'::regconfig, tags::text));
+
+
+btree  fit for
+
++ equality(=, <=, >=)
++ range(between in, < >)
++ sorting
+
+rtree fit for
+
++ lines(line, lseg, interval)
++ spatial(cicle, path, polygon)
++ volumetrix(box)
+
+hash :x=y
+
+gin: full text search
+
+tsvector:
+The tsvector type represents a document in a form suited for text search
+
+llexeme:
+
+a levema is an abstract unit of morphological analysis in lingustics, that roughly corresponds to a set of forms taken by a single word
+
+
+> select count(0) from posts where to_tsvcecor('english', tags) @@ plainto_tsquery('english', 'postgresql')
 
 
 
+select to_tsvector('english', 'hello world');
+select to_tsquery('english', 'hello');
+
+select to_tsvector('english', 'hello world') @@ to_tsquery('english', 'hello');
+
+tsvector is simply a data type - you can create a column in your table to hold tsvector information rather than convert it on the fly...
+
+tsvector is a first-class data type, which means it can be indexed for performance...
+
+
+alter table posts add column tagssvector tsvector;
+
+create index ftx_tagsvectorindex
+on posts
+ using gin
+ (tagsvector)
 
 
 
+create trigger posts_tags_vector
+before insert or update on posts
+for each row
+execute procedure tsvector_update_trigger('tagsvector', 'pg_catalog.english', 'tags')
+update 
+
+select count(0) from posts where tagsvector @@ plainto_tsquery('english', 'postgresql')
+
+
+create or replace function getpostsbytag(searchy character varying)
+    returns error posts as
+    $BODY$
+    select  * from posts
+    where tagsvector @@ plainto_tsquery('english', $1);
+    $BODY$
+    language SQL
+    cost 100
+    rows 1000;
+
+
+
+select getpostsbytag('postgres')
+select * from getpostsbytag('postgres')
 
 
 
